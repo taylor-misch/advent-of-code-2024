@@ -9,14 +9,14 @@ import (
 
 func Part1() {
 	fmt.Println("Part 1 Begin")
-	i := utilities.ReadInput("day1/day-1-input.txt")
+	i := utilities.ReadInput("day1/day01-input.txt")
 	list1, list2 := parseInput(i)
 	sortedList1 := sortList(list1)
 	sortedList2 := sortList(list2)
 
 	totalDistance := 0
 	for i := 0; i < len(sortedList1); i++ {
-		totalDistance += absoluteValue(sortedList2[i] - sortedList1[i])
+		totalDistance += utilities.AbsoluteValue(sortedList2[i] - sortedList1[i])
 	}
 	fmt.Println("Total Distance: ", totalDistance)
 	fmt.Println("Part 1 End")
@@ -24,7 +24,7 @@ func Part1() {
 
 func Part2() {
 	fmt.Println("Part 2 Begin")
-	i := utilities.ReadInput("day1/day-1-input.txt")
+	i := utilities.ReadInput("day1/day01-input.txt")
 	list1, list2 := parseInput(i)
 
 	mapOfNumberCount := make(map[int]int)
@@ -77,11 +77,4 @@ func sortList(list []int) []int {
 		}
 	}
 	return list
-}
-
-func absoluteValue(n int) int {
-	if n < 0 {
-		return -n
-	}
-	return n
 }

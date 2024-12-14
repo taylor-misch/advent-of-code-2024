@@ -1,4 +1,4 @@
-package day1
+package day01
 
 import (
 	"advent-of-code-2024/utilities"
@@ -9,7 +9,7 @@ import (
 
 func Part1() {
 	fmt.Println("Part 1 Begin")
-	i := utilities.ReadInput("day1/day01-input.txt")
+	i := utilities.ReadInput("day01/day01-input.txt")
 	list1, list2 := parseInput(i)
 	sortedList1 := sortList(list1)
 	sortedList2 := sortList(list2)
@@ -24,7 +24,7 @@ func Part1() {
 
 func Part2() {
 	fmt.Println("Part 2 Begin")
-	i := utilities.ReadInput("day1/day01-input.txt")
+	i := utilities.ReadInput("day01/day01-input.txt")
 	list1, list2 := parseInput(i)
 
 	mapOfNumberCount := make(map[int]int)

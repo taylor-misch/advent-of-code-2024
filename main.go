@@ -1,13 +1,13 @@
 package main
 
 import (
-	"advent-of-code-2024/day3"
+	"advent-of-code-2024/day03"
 )
 
 func main() {
-	//day2.Part1()
-	//day2.Part2() // TODO
+	//day02.Part1()
+	//day02.Part2() // TODO
 
-	day3.Part2()
+	day03.Part2()
 
 }

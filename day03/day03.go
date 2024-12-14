@@ -1,4 +1,4 @@
-package day3
+package day03
 
 import (
 	"advent-of-code-2024/utilities"
@@ -10,7 +10,7 @@ import (
 
 func Part1() {
 	fmt.Println("Day 3 Part 1 Begin")
-	i := utilities.ReadInput("day3/day03-input.txt")
+	i := utilities.ReadInput("day03/day03-input.txt")
 	r, _ := regexp.Compile("mul\\([0-9]+,[0-9]+\\)")
 	matches := r.FindAllString(i, -1)
 	result := 0
@@ -24,7 +24,7 @@ func Part1() {
 
 func Part2() {
 	fmt.Println("Day 3 Part 2 Begin")
-	i := utilities.ReadInput("day3/day03-input-test02.txt")
+	i := utilities.ReadInput("day03/day03-input-test02.txt")
 	//r, _ := regexp.Compile("mul\\([0-9]+,[0-9]+\\)")
 	//matches := r.FindAllString(i, -1)
 	doDontRegex, _ := regexp.Compile("don't\\(\\)")

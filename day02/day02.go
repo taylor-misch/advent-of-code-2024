@@ -1,4 +1,4 @@
-package day2
+package day02
 
 import (
 	"advent-of-code-2024/utilities"
@@ -9,7 +9,7 @@ import (
 
 func Part1() {
 	fmt.Println("Part 1 Begin")
-	i := utilities.ReadInput("day2/day02-input.txt")
+	i := utilities.ReadInput("day02/day02-input.txt")
 	reports := parseInput(i)
 
 	safeReports := 0
@@ -27,7 +27,7 @@ func Part1() {
 
 func Part2() {
 	fmt.Println("Part 2 Begin")
-	i := utilities.ReadInput("day2/day02-input-test.txt")
+	i := utilities.ReadInput("day02/day02-input-test.txt")
 	reports := parseInput(i)
 
 	safeReports := 0

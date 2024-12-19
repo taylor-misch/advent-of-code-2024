@@ -18,7 +18,7 @@ func Part1() {
 	positionsVisited[guard.position] = true
 	isGuardInGrid := true
 	for isGuardInGrid {
-		guard, _ = walk(guard, obstacles)
+		guard = walk(guard, obstacles)
 		if hasGuardLeftGrid(guard, xSize, ySize) {
 			isGuardInGrid = false
 		} else {
@@ -40,18 +40,36 @@ func Part2() {
 	guardsPosition, obstacles, xSize, ySize := parseInput(i)
 
 	guard := Guard{guardsPosition, utilities.Coordinate{0, -1}}
-	fmt.Println(guardsPosition)
-	fmt.Println(obstacles)
+	originalPosition := guard.position
+	//fmt.Println(guardsPosition)
+	//fmt.Println(obstacles)
 
-	infiniteLoopObstacles := make([]utilities.Coordinate, 0)
+	infiniteLoopObstaclesMap := map[utilities.Coordinate]int{}
+	//infiniteLoopObstacles := make([]utilities.Coordinate, 0)
 	positionsVisited := map[utilities.Coordinate]VisitedPosition{}
 	positionsVisited[guard.position] = VisitedPosition{true, []utilities.Coordinate{guard.direction}}
 	isGuardInGrid := true
 	for isGuardInGrid {
-		if obstaclePlacement, loopOccurs := castRayAndCheckForPreviousVisitOrObstacle(guard, obstacles, positionsVisited, xSize, ySize); loopOccurs {
-			infiniteLoopObstacles = append(infiniteLoopObstacles, obstaclePlacement)
+		//fmt.Println("Guard position: ", guard.position)
+		// try with 500,000 steps to determine loop
+		if obstaclePlacement, loopOccurs := walkForALongLimitToTestLoop(20000, guard, obstacles, xSize, ySize); loopOccurs {
+			if !listContains(obstacles, obstaclePlacement) &&
+				!positionIsOutsideGrid(obstaclePlacement, xSize, ySize) &&
+				(obstaclePlacement != originalPosition) {
+				if _, exists := infiniteLoopObstaclesMap[obstaclePlacement]; exists {
+					fmt.Println("Obstacle placement already in map: ", obstaclePlacement)
+					infiniteLoopObstaclesMap[obstaclePlacement]++
+				} else {
+					infiniteLoopObstaclesMap[obstaclePlacement] = 1
+				}
+			} else {
+				fmt.Println("Obstacle placement invalid: ", obstaclePlacement)
+			}
 		}
-		guard, _ = walk(guard, obstacles)
+		//if obstaclePlacement, loopOccurs := castRayAndCheckForPreviousVisitOrObstacle(guard, obstacles, positionsVisited, xSize, ySize); loopOccurs {
+		//	infiniteLoopObstacles = append(infiniteLoopObstacles, obstaclePlacement)
+		//}
+		guard = walk(guard, obstacles)
 		if hasGuardLeftGrid(guard, xSize, ySize) {
 			isGuardInGrid = false
 		} else {
@@ -64,8 +82,8 @@ func Part2() {
 		}
 	}
 
-	fmt.Println("Infinite loop obstacles: ", infiniteLoopObstacles)
-	fmt.Println("Infinite loop possibilities: ", len(infiniteLoopObstacles))
+	fmt.Println("Infinite loop obstacles: ", infiniteLoopObstaclesMap)
+	fmt.Println("Infinite loop possibilities: ", len(infiniteLoopObstaclesMap))
 
 }
 
@@ -106,17 +124,18 @@ func turnRight(direction utilities.Coordinate) utilities.Coordinate {
 	}
 }
 
-func walk(guard Guard, obstacles []utilities.Coordinate) (Guard, bool) {
+func walk(guard Guard, obstacles []utilities.Coordinate) Guard {
 	nextPosition := utilities.Coordinate{guard.position.X + guard.direction.X, guard.position.Y + guard.direction.Y}
 	if listContains(obstacles, nextPosition) {
 		guard.direction = turnRight(guard.direction)
-		return guard, true
+		return guard
 	} else {
 		guard.position = nextPosition
 	}
-	return guard, false
+	return guard
 }
 
+// elegant approach - cast a ray in the direction of the guard and check for obstacles or previous visits - couldn't get it to work
 func castRayAndCheckForPreviousVisitOrObstacle(guard Guard, obstacles []utilities.Coordinate, positionsVisited map[utilities.Coordinate]VisitedPosition, xSize int, ySize int) (utilities.Coordinate, bool) {
 	obstaclePlacement := utilities.Coordinate{guard.position.X + guard.direction.X, guard.position.Y + guard.direction.Y}
 	//fmt.Println("Guard position: ", guard.position, "Obstacle placement consideration: ", obstaclePlacement)
@@ -149,10 +168,23 @@ func castRayAndCheckForPreviousVisitOrObstacle(guard Guard, obstacles []utilitie
 	}
 }
 
+// brute force approach - have the guard walk a long distance and check if he leaves the grid
+// if he reaches the step count without leaving the grid, assume the guard will walk in a loop if obstacle is placed
+func walkForALongLimitToTestLoop(numberOfSteps int, guard Guard, obstacles []utilities.Coordinate, xSize int, ySize int) (utilities.Coordinate, bool) {
+	obstaclePlacement := utilities.Coordinate{guard.position.X + guard.direction.X, guard.position.Y + guard.direction.Y}
+	obstacles = append(obstacles, obstaclePlacement)
+	for i := 0; i < numberOfSteps; i++ {
+		guard = walk(guard, obstacles)
+		if hasGuardLeftGrid(guard, xSize, ySize) {
+			return obstaclePlacement, false
+		}
+	}
+	return obstaclePlacement, true
+}
+
 func listContains(slice []utilities.Coordinate, value utilities.Coordinate) bool {
 	for _, v := range slice {
 		if v.X == value.X && v.Y == value.Y {
-			fmt.Println("Obstacle hit at: ", value)
 			return true
 		}
 	}
@@ -161,6 +193,15 @@ func listContains(slice []utilities.Coordinate, value utilities.Coordinate) bool
 
 func hasGuardLeftGrid(guard Guard, gridX int, gridY int) bool {
 	return guard.position.X < 0 || guard.position.X >= gridX || guard.position.Y < 0 || guard.position.Y >= gridY
+}
+
+func positionIsOutsideGrid(position utilities.Coordinate, xSize int, ySize int) bool {
+	if position.X < 0 || position.X >= xSize || position.Y < 0 || position.Y >= ySize {
+		fmt.Println("Position: ", position, " xSize: ", xSize, " ySize: ", ySize, " - Outside grid")
+		return true
+	} else {
+		return false
+	}
 }
 
 type Guard struct {

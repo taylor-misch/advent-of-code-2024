@@ -14,7 +14,7 @@ func Part1() {
 
 	safeReports := 0
 	for _, report := range reports {
-		if isReportSafe(report) {
+		if isReportSafePart1(report) {
 			safeReports++
 		} else {
 			fmt.Println("Unsafe Report: ", report)
@@ -27,15 +27,13 @@ func Part1() {
 
 func Part2() {
 	fmt.Println("Part 2 Begin")
-	i := utilities.ReadInput("day02/day02-input-test.txt")
+	i := utilities.ReadInput("day02/day02-input.txt")
 	reports := parseInput(i)
 
 	safeReports := 0
 	for _, report := range reports {
-		if isReportSafeV2(report) {
+		if isReportSafePar2(report) {
 			safeReports++
-		} else {
-			fmt.Println("Unsafe Report: ", report)
 		}
 	}
 
@@ -63,7 +61,7 @@ func parseInput(data string) [][]int {
 	return reports
 }
 
-func isReportSafe(report []int) bool {
+func isReportSafePart1(report []int) bool {
 	reportLength := len(report)
 	if !isIncreasing(report) && !isDecreasing(report) {
 		return false
@@ -98,50 +96,21 @@ func isDecreasing(report []int) bool {
 }
 
 // part2
-func isReportSafeV2(report []int) bool {
-	reportLength := len(report)
-	issuesFound := 0
+func isReportSafePar2(report []int) bool {
 
-	// it can only be one direction or the other can't count issues from both
-	//issuesFound += isIncreasingV2(report)
-	//issuesFound += isDecreasingV2(report)
-
-	// there could be overlap in the issues found causing an over count
-
-	increasing := report[0] < report[reportLength-1]
-
-	for i := 0; i < reportLength-1; i++ {
-		trendingCorrectly := increasing == (report[i] < report[i+1])
-		if !trendingCorrectly {
-			fmt.Println("Trending Incorrectly: ", report[i], report[i+1])
-		}
-		absoluteDiff := utilities.AbsoluteValue(report[i] - report[i+1])
-		if absoluteDiff < 1 || absoluteDiff > 3 || !trendingCorrectly {
-			fmt.Println("Issue found: ", report[i], report[i+1])
-			issuesFound++
+	if isReportSafePart1(report) {
+		fmt.Println("Full report safe: ", report)
+		return true
+	} else {
+		fmt.Println("Checking Pieces of Report: ", report)
+		for i := 0; i < len(report); i++ {
+			shortenedReport := append([]int{}, report[:i]...)
+			shortenedReport = append(shortenedReport, report[i+1:]...)
+			if isReportSafePart1(shortenedReport) {
+				fmt.Println("Safe Report Found: ", shortenedReport)
+				return true
+			}
 		}
 	}
-	return issuesFound < 2
-}
-
-func isIncreasingV2(report []int) int {
-	issuesFound := 0
-	reportLength := len(report)
-	for i := 0; i < reportLength-1; i++ {
-		if report[i] > report[i+1] {
-			issuesFound++
-		}
-	}
-	return issuesFound
-}
-
-func isDecreasingV2(report []int) int {
-	issuesFound := 0
-	reportLength := len(report)
-	for i := 0; i < reportLength-1; i++ {
-		if report[i] < report[i+1] {
-			issuesFound++
-		}
-	}
-	return issuesFound
+	return false
 }

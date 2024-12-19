@@ -33,3 +33,9 @@ func AbsoluteValue(n int) int {
 	}
 	return n
 }
+
+// Coordinate struct to hold x and y values
+type Coordinate struct {
+	X int
+	Y int
+}

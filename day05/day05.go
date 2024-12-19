@@ -4,6 +4,7 @@ import (
 	"advent-of-code-2024/utilities"
 	"fmt"
 	"math"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -11,20 +12,14 @@ import (
 func Part1() {
 	i := utilities.ReadInput("day05/day05-input.txt")
 	rules, printUpdates := parseInput(i)
-	fmt.Println("Rules: ", rules)
-	fmt.Println("Print updates: ", printUpdates)
 
 	ruleMap := createRuleMap(rules)
-	fmt.Println("Rule Map: ", ruleMap)
 	validPrintUpdates := make([]PrintUpdate, 0)
 	for _, printUpdate := range printUpdates {
 		if validatePrintOrder(ruleMap, printUpdate) {
 			validPrintUpdates = append(validPrintUpdates, printUpdate)
 		}
 	}
-
-	fmt.Println("Valid Print Updates: ", validPrintUpdates)
-
 	sumOfMiddleNumbers := 0
 	for _, printUpdate := range validPrintUpdates {
 		middleIndex := math.Ceil(float64(len(printUpdate.updates) / 2))
@@ -35,7 +30,31 @@ func Part1() {
 }
 
 func Part2() {
+	i := utilities.ReadInput("day05/day05-input.txt")
+	rules, printUpdates := parseInput(i)
+	fmt.Println("Rules: ", rules)
+	fmt.Println("Print updates: ", printUpdates)
 
+	ruleMap := createRuleMap(rules)
+	fmt.Println("Rule Map: ", ruleMap)
+	invalidPrintUpdates := make([]PrintUpdate, 0)
+	for _, printUpdate := range printUpdates {
+		if !validatePrintOrder(ruleMap, printUpdate) {
+			invalidPrintUpdates = append(invalidPrintUpdates, printUpdate)
+		}
+	}
+
+	for _, printUpdate := range invalidPrintUpdates {
+		sort.Slice(printUpdate.updates, customComparator(printUpdate.updates, ruleMap))
+	}
+
+	sumOfMiddleNumbers := 0
+	for _, printUpdate := range invalidPrintUpdates {
+		middleIndex := math.Ceil(float64(len(printUpdate.updates) / 2))
+		sumOfMiddleNumbers += printUpdate.updates[int(middleIndex)]
+	}
+
+	fmt.Println("Sum of middle numbers: ", sumOfMiddleNumbers)
 }
 
 func parseInput(data string) ([]Rule, []PrintUpdate) {
@@ -46,7 +65,6 @@ func parseInput(data string) ([]Rule, []PrintUpdate) {
 	for _, line := range lines {
 		if strings.Contains(line, "|") {
 			parts := strings.Split(line, "|")
-			fmt.Println("Parts: ", parts)
 			rule := Rule{}
 			rule.pageInFront, _ = strconv.Atoi(parts[0])
 			rule.pageBehind, _ = strconv.Atoi(parts[1])
@@ -107,6 +125,26 @@ func listContains(slice []int, value int) bool {
 		}
 	}
 	return false
+}
+
+// part 2
+// Function to check if a number can be inserted before another number based on the rules
+func canInsertBefore(a int, b int, ruleMap map[int][]int) bool {
+	if rules, exists := ruleMap[a]; exists {
+		for _, rule := range rules {
+			if rule == b {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+// Custom comparator function for sorting
+func customComparator(numbers []int, ruleMap map[int][]int) func(i, j int) bool {
+	return func(i, j int) bool {
+		return canInsertBefore(numbers[i], numbers[j], ruleMap)
+	}
 }
 
 type Rule struct {

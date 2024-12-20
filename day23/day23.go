@@ -1,4 +1,4 @@
-package day04
+package day23
 
 func Part1() {
 
